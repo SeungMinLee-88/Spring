@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.book_conference.dataroom.dao.DataRoomIDao">
+<select id="SelectDownloadList" resultType="com.book_conference.dataroom.dto.DownloadDto">
+	SELECT * FROM (SELECT DOWNLOAD_NUM, DOWNLOAD_TITLE, 
+	DOWNLOAD_CONTENT, DOWNLOAD_WRITER, DOWNLOAD_HIT,
+	DOWNLOAD_TOP, CREATE_DATE, 
+	ROW_NUMBER() OVER (ORDER BY DOWNLOAD_NUM DESC) AS RNUM
+	FROM DOWNLOAD_TABLE WHERE 1=1
+	<if test="param1 != null and param1.equals('TITLE')">
+	AND DOWNLOAD_TITLE LIKE '%'||#{param2}||'%' 
+	</if>
+	<if test="param1 != null and param1.equals('WRITER')">
+	 AND DOWNLOAD_WRITER LIKE '%'||#{param2}||'%' 
+	</if>
+	
+	)
+	WHERE RNUM BETWEEN (#{param3}*7-6) AND (#{param3}*7)
+</select>
+
+<select id="SelectDownloadTopList" resultType="com.book_conference.dataroom.dto.DownloadDto">
+	SELECT * FROM DOWNLOAD_TABLE WHERE DOWNLOAD_TOP = 'y' ORDER BY DOWNLOAD_NUM DESC
+</select>
+
+<select id="SelectDownloadCount" resultType="int">
+	SELECT COUNT(*) AS CNT  FROM DOWNLOAD_TABLE
+	WHERE 1=1
+	<if test="param1 != null and param1.equals('TITLE')">
+	AND DOWNLOAD_TITLE LIKE  '%'||#{param2}||'%' 
+	</if>
+	<if test="param1 != null and param1.equals('WRITER')">
+	AND DOWNLOAD_WRITER LIKE '%'||#{param2}||'%' 
+	</if>
+</select>
+
+<insert id="DownloadWriteProcess">
+	INSERT INTO DOWNLOAD_TABLE
+	(DOWNLOAD_NUM, DOWNLOAD_TITLE, DOWNLOAD_CONTENT, DOWNLOAD_WRITER,DOWNLOAD_FILENAME, DOWNLOAD_FILE, DOWNLOAD_HIT,DOWNLOAD_TOP,CREATE_DATE)
+		VALUES 
+		((
+		SELECT NVL(MAX(DOWNLOAD_NUM),0) FROM DOWNLOAD_TABLE)+1, 
+		#{param1}, #{param2}, #{param3}, #{param4}, #{param5}, 0, #{param6}, SYSDATE)
+</insert>
+
+<select id="SelectDownloadInfo" resultType="com.book_conference.dataroom.dto.DownloadDto">
+	SELECT * FROM DOWNLOAD_TABLE WHERE DOWNLOAD_NUM = #{param1}
+</select>
+
+<update id="DownloadHitCountIncrese">
+	UPDATE DOWNLOAD_TABLE SET 
+	DOWNLOAD_HIT = (SELECT DOWNLOAD_HIT FROM DOWNLOAD_TABLE WHERE DOWNLOAD_NUM =#{param1})+1
+	WHERE DOWNLOAD_NUM =#{param1}
+</update>
+
+<update id="DownloadModifyProcess">
+	UPDATE DOWNLOAD_TABLE SET 
+	DOWNLOAD_TITLE = #{param1},
+	DOWNLOAD_CONTENT = #{param2},
+	DOWNLOAD_WRITER = #{param3},
+	DOWNLOAD_FILENAME = #{param4},
+	DOWNLOAD_FILE = #{param5},
+	DOWNLOAD_TOP = #{param6},
+	UPDATE_DATE = SYSDATE
+	WHERE DOWNLOAD_NUM =#{param7}
+</update>
+
+<delete id="DownloadDelete">
+	DELETE FROM DOWNLOAD_TABLE WHERE DOWNLOAD_NUM = #{param1}
+</delete>
+
+
+<!-- VIDEO VIDEO VIDEO VIDEO VIDEO VIDEO VIDEO VIDEO VIDEO VIDEO VIDEO VIDEO VIDEO VIDEO -->
+
+<select id="SelectVideoList" resultType="com.book_conference.dataroom.dto.VideoDto">
+	SELECT * FROM (SELECT VIDEO_NUM, VIDEO_TITLE, 
+	VIDEO_CONTENT, VIDEO_WRITER, VIDEO_HIT,
+	VIDEO_TOP, CREATE_DATE, 
+	ROW_NUMBER() OVER (ORDER BY VIDEO_NUM DESC) AS RNUM
+	FROM VIDEO_TABLE WHERE 1=1
+	<if test="param1 != null and param1.equals('TITLE')">
+	AND VIDEO_TITLE LIKE '%'||#{param2}||'%' 
+	</if>
+	<if test="param1 != null and param1.equals('WRITER')">
+	 AND VIDEO_WRITER LIKE '%'||#{param2}||'%' 
+	</if>
+	
+	)
+	WHERE RNUM BETWEEN (#{param3}*7-6) AND (#{param3}*7)
+</select>
+
+<select id="SelectVideoTopList" resultType="com.book_conference.dataroom.dto.VideoDto">
+	SELECT * FROM VIDEO_TABLE WHERE VIDEO_TOP = 'y' ORDER BY VIDEO_NUM DESC
+</select>
+
+<select id="SelectVideoCount" resultType="int">
+	SELECT COUNT(*) AS CNT  FROM VIDEO_TABLE
+	WHERE 1=1
+	<if test="param1 != null and param1.equals('TITLE')">
+	AND VIDEO_TITLE LIKE  '%'||#{param2}||'%' 
+	</if>
+	<if test="param1 != null and param1.equals('WRITER')">
+	AND VIDEO_WRITER LIKE '%'||#{param2}||'%' 
+	</if>
+</select>
+
+<insert id="VideoWriteProcess">
+	INSERT INTO VIDEO_TABLE
+	(VIDEO_NUM, VIDEO_TITLE, VIDEO_CONTENT, VIDEO_WRITER,VIDEO_FILENAME, VIDEO_FILE,
+	VIDEO_LINK, VIDEO_TYPE, VIDEO_HIT,VIDEO_TOP,CREATE_DATE)
+		VALUES 
+		((
+		SELECT NVL(MAX(VIDEO_NUM),0) FROM VIDEO_TABLE)+1, 
+		#{param1}, #{param2}, #{param3}, #{param4}, #{param5}, #{param6}, #{param7}, 0, #{param8}, SYSDATE)
+</insert>
+
+<select id="SelectVideoInfo" resultType="com.book_conference.dataroom.dto.VideoDto">
+	SELECT * FROM VIDEO_TABLE WHERE VIDEO_NUM = #{param1}
+</select>
+
+<update id="VideoModifyProcess">
+	UPDATE VIDEO_TABLE SET 
+	VIDEO_TITLE = #{param1},
+	VIDEO_CONTENT = #{param2},
+	VIDEO_WRITER = #{param3},
+	VIDEO_FILENAME = #{param4},
+	VIDEO_FILE = #{param5},
+	VIDEO_LINK = #{param6},
+	VIDEO_TYPE = #{param7},
+	VIDEO_TOP = #{param8},
+	UPDATE_DATE = SYSDATE
+	WHERE VIDEO_NUM =#{param9}
+</update>
+
+<delete id="VideoDelete">
+	DELETE FROM VIDEO_TABLE WHERE VIDEO_NUM = #{param1}
+</delete>
+
+
+</mapper>

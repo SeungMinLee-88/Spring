@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+	"http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+
+<tiles-definitions>
+	<definition name="layouts-tiles" template="/WEB-INF/book_conference/tiles/layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/book_conference/tiles/header.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/book_conference/tiles/footer.jsp" />
+		<put-attribute name="content" value="" />
+	</definition>
+	<definition name="*/*.tiles" extends="layouts-tiles">
+		<put-attribute name="content" value="/WEB-INF/book_conference/{1}/{2}.jsp" />
+	</definition>
+	<definition name="*/*/*.tiles" extends="layouts-tiles">
+		<put-attribute name="content" value="/WEB-INF/book_conference/{1}/{2}/{3}.jsp" />
+	</definition>
+	
+	<!-- Admin -->
+	<definition name="Admin-layouts-tiles" template="/WEB-INF/book_conference/tiles/admin_layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/book_conference/tiles/header.jsp" />
+		<put-attribute name="adminaside" value="/WEB-INF/book_conference/tiles/admin_aside.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/book_conference/tiles/footer.jsp" />
+		<put-attribute name="content" value="" />
+	</definition>
+	<definition name="*/*.admintiles" extends="Admin-layouts-tiles">
+		<put-attribute name="content" value="/WEB-INF/book_conference/{1}/{2}.jsp" />
+	</definition>
+	<definition name="*/*/*.admintiles" extends="Admin-layouts-tiles">
+		<put-attribute name="content" value="/WEB-INF/book_conference/{1}/{2}/{3}.jsp" />
+	</definition>
+	
+	<!-- Member -->
+	
+	<definition name="Member-layouts-tiles" template="/WEB-INF/book_conference/tiles/member_layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/book_conference/tiles/header.jsp" />
+		<put-attribute name="memberaside" value="/WEB-INF/book_conference/tiles/member_aside.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/book_conference/tiles/footer.jsp" />
+		<put-attribute name="content" value="" />
+	</definition>
+	<definition name="*/*.membertiles" extends="Member-layouts-tiles">
+		<put-attribute name="content" value="/WEB-INF/book_conference/{1}/{2}.jsp" />
+	</definition>
+	<definition name="*/*/*.membertiles" extends="Member-layouts-tiles">
+		<put-attribute name="content" value="/WEB-INF/book_conference/{1}/{2}/{3}.jsp" />
+	</definition>
+	
+	<!-- Notice -->
+	<definition name="Notice-layouts-tiles" template="/WEB-INF/book_conference/tiles/notice_layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/book_conference/tiles/header.jsp" />
+		<put-attribute name="noticeaside" value="/WEB-INF/book_conference/tiles/notice_aside.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/book_conference/tiles/footer.jsp" />
+		<put-attribute name="content" value="" />
+	</definition>
+	<definition name="*/*.noticetiles" extends="Notice-layouts-tiles">
+		<put-attribute name="content" value="/WEB-INF/book_conference/{1}/{2}.jsp" />
+	</definition>
+	<definition name="*/*/*.noticetiles" extends="Notice-layouts-tiles">
+		<put-attribute name="content" value="/WEB-INF/book_conference/{1}/{2}/{3}.jsp" />
+	</definition>
+	
+	
+	<!-- Dataroom -->
+	<definition name="Data-layouts-tiles" template="/WEB-INF/book_conference/tiles/data_layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/book_conference/tiles/header.jsp" />
+		<put-attribute name="dataaside" value="/WEB-INF/book_conference/tiles/data_aside.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/book_conference/tiles/footer.jsp" />
+		<put-attribute name="content" value="" />
+	</definition>
+	<definition name="*/*.datatiles" extends="Data-layouts-tiles">
+		<put-attribute name="content" value="/WEB-INF/book_conference/{1}/{2}.jsp" />
+	</definition>
+	<definition name="*/*/*.datatiles" extends="Data-layouts-tiles">
+		<put-attribute name="content" value="/WEB-INF/book_conference/{1}/{2}/{3}.jsp" />
+	</definition>
+	
+	
+	<definition name="empty" template="/WEB-INF/book_conference/tiles/empty.jsp">
+		<put-attribute name="content"   	value="" />
+	</definition>
+	
+	<definition name="*/*" extends="empty">
+		<put-attribute name="content" value="/WEB-INF/book_conference/{1}/{2}.jsp" />
+	</definition>
+	<definition name="*/*/*" extends="empty">
+		<put-attribute name="content" value="/WEB-INF/book_conference/{1}/{2}/{3}.jsp" />
+	</definition>
+	
+	
+</tiles-definitions>

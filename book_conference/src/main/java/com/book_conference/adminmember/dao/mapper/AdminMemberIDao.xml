@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.book_conference.adminmember.dao.AdminMemberIDao">
+
+<select id="SelectApplyList" resultType="com.book_conference.adminmember.dto.ApplyContentDto">
+	SELECT * FROM (SELECT APPLY_NUM, MEMBER_NAME, 
+	MEMBER_DEPTNAME, MEMBER_DEPTCODE, MEMBER_ID, APPLY_STATUS,
+	ROW_NUMBER() OVER (ORDER BY APPLY_NUM DESC) AS RNUM
+	FROM MEMBER_APPLY WHERE 1=1 AND APPLY_STATUS= 'w')
+	WHERE RNUM BETWEEN (#{param1}*7-6) AND (#{param1}*7)
+	
+</select>
+<select id="SelectApply" resultType="com.book_conference.adminmember.dto.ApplyContentDto">
+	SELECT * FROM MEMBER_APPLY WHERE APPLY_NUM = #{param1}
+</select>
+
+<select id="SelectApplyListCount" resultType="int">
+	SELECT COUNT(*) AS CNT FROM MEMBER_APPLY WHERE 1=1 AND APPLY_STATUS= 'w'
+</select>
+
+<update id="UpdateApply">
+	UPDATE MEMBER_APPLY SET APPLY_STATUS= #{param1} WHERE APPLY_NUM = #{param2}
+</update>
+
+<insert id="ApproveApply">
+		INSERT INTO MEMBER_TABLE (MEMBER_NUM, MEMBER_NAME, MEMBER_DEPTNAME, MEMBER_DEPTCODE,MEMBER_ID,
+		MEMBER_PW,MEMBER_EMAIL,MEMBER_JOIN_DATE, MEMBER_ADMIN
+		) SELECT 
+		(SELECT NVL(MAX(MEMBER_NUM),0) FROM MEMBER_TABLE)+1,
+		MEMBER_NAME, 
+		MEMBER_DEPTNAME, 
+		MEMBER_DEPTCODE,
+		MEMBER_ID,
+		MEMBER_PW,
+		MEMBER_EMAIL,
+		SYSDATE,
+		'n'
+		FROM MEMBER_APPLY
+		WHERE APPLY_NUM = #{param1}
+	</insert>
+	
+<select id="SelectMemberList" resultType="com.book_conference.adminmember.dto.MemberContentDto">
+	SELECT * FROM (SELECT MEMBER_NUM, MEMBER_NAME, 
+	MEMBER_DEPTNAME, MEMBER_DEPTCODE, MEMBER_ID, 
+	ROW_NUMBER() OVER (ORDER BY MEMBER_NUM DESC) AS RNUM
+	FROM MEMBER_TABLE WHERE 1=1
+	<if test="param1 != null">
+	AND MEMBER_DEPTCODE LIKE CONCAT(#{param1},'%') 
+	</if>
+	
+	<if test="param2 != null">
+	AND MEMBER_NAME LIKE '%'||#{param2}||'%'
+	</if>
+	
+	<if test="param3 != null">
+	AND MEMBER_ID LIKE '%'||#{param3}||'%'
+	</if>
+	AND MEMBER_ID != 'admin'
+	)WHERE RNUM BETWEEN (#{param4}*7-6) AND (#{param4}*7)
+</select>
+
+<select id="SelectMemberCount" resultType="int">
+	SELECT COUNT(*) AS CNT FROM MEMBER_TABLE WHERE 1=1
+	
+	<if test="param1 != null">
+	AND MEMBER_DEPTCODE LIKE CONCAT(#{param1},'%') 
+	</if>
+	
+	<if test="param2 != null">
+	AND MEMBER_NAME LIKE CONCAT(#{param2},'%')
+	</if>
+	
+	<if test="param3 != null">
+	AND MEMBER_ID LIKE CONCAT(#{param3},'%')
+	</if>
+	AND MEMBER_ID != 'admin'
+</select>
+<delete id="DeleteMember">
+DELETE FROM MEMBER_TABLE WHERE MEMBER_NUM=#{param1}
+</delete>
+
+</mapper>

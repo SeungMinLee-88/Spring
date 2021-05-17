@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+
+<mapper namespace="com.book_conference.memberreserve.dao.MemberReserveIDao">
+
+
+<insert id="MemberBookWrite">
+	INSERT INTO 
+	<if test="param1 == null">
+	 ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	 ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	 ROOMB_TABLE
+	</if>
+		(BOOK_NUM, BOOK_MEMBER, BOOK_TIME, BOOK_TOTAL_TIME,BOOK_DATE,BOOK_REASON,CREATE_TIME,UPDATE_TIME)
+		VALUES 
+		((
+		SELECT NVL(MAX(BOOK_NUM),0)
+		<if test="param1 == null">
+		FROM ROOMA_TABLE
+		</if>
+		<if test="param1 != null and param1.equals('ROOMA')">
+		FROM ROOMA_TABLE
+		</if>
+		<if test="param1 != null and param1.equals('ROOMB')">
+		FROM ROOMB_TABLE
+		</if>
+		)+1, 
+		#{param2}, #{param3}, #{param4}, #{param5}, #{param6},SYSDATE,SYSDATE)
+	</insert>
+	
+	
+	<select id="SelectMemberReserveList" resultType="com.book_conference.memberreserve.dto.RoomDto">
+	SELECT * FROM (SELECT BOOK_NUM, BOOK_MEMBER, 
+	BOOK_TIME, BOOK_TOTAL_TIME, BOOK_DATE, 
+	ROW_NUMBER() OVER (ORDER BY BOOK_NUM DESC) AS RNUM
+	
+	<if test="param1 == null">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	 FROM ROOMB_TABLE
+	</if>
+	
+	WHERE BOOK_MEMBER = #{param2} AND BOOK_DATE LIKE CONCAT(#{param3},'%') )
+	WHERE RNUM BETWEEN (#{param4}*7-6) AND (#{param4}*7)
+	</select>
+	
+	
+	<select id="SelectMemberReserveListCount" resultType="int">
+	SELECT COUNT(*) AS CNT 
+	
+	<if test="param1 == null">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	 FROM ROOMB_TABLE
+	</if>
+	
+	WHERE BOOK_MEMBER = #{param2} AND BOOK_DATE LIKE CONCAT(#{param3},'%')
+	</select>
+	
+	
+	<select id="SelectMemberBookInfo" resultType="com.book_conference.memberreserve.dto.RoomDto">
+	SELECT *
+	<if test="param1 == null">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	 FROM ROOMB_TABLE
+	</if>
+	WHERE BOOK_NUM=#{param2}
+	</select>
+	
+	
+	<update id="MemberBookUpdate">
+	UPDATE 
+	<if test="param1 == null">
+	 ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	 ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	 ROOMB_TABLE
+	</if>
+	SET
+	BOOK_TIME = #{param2}, 
+	BOOK_TOTAL_TIME = #{param3},
+	BOOK_DATE = #{param4},
+	BOOK_REASON = #{param5}, 
+	UPDATE_TIME = SYSDATE
+	WHERE BOOK_NUM = #{param6}
+	</update>
+
+	<delete id="MemberDeleteBook">
+    DELETE
+	<if test="param1 == null">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	 FROM ROOMB_TABLE
+	</if>
+	WHERE BOOK_NUM = #{param2}
+	</delete>
+
+
+	<select id="MemberReserveStatusList" resultType="com.book_conference.memberreserve.dto.RoomDto">
+	SELECT * FROM (SELECT BOOK_NUM, BOOK_MEMBER, 
+	BOOK_TIME, BOOK_TOTAL_TIME, BOOK_DATE, 
+	ROW_NUMBER() OVER (ORDER BY BOOK_NUM DESC) AS RNUM
+	
+	<if test="param1 == null">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	 FROM ROOMB_TABLE
+	</if>
+	
+	WHERE BOOK_DATE LIKE CONCAT(#{param2},'%') )
+	WHERE RNUM BETWEEN (#{param3}*7-6) AND (#{param3}*7)
+	</select>
+	
+	<select id="MemberReserveStatusListCount" resultType="int">
+	SELECT COUNT(*) AS CNT 
+	
+	<if test="param1 == null">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	 FROM ROOMB_TABLE
+	</if>
+	WHERE BOOK_DATE LIKE CONCAT(#{param2},'%')
+	</select>
+	
+
+</mapper>

@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+
+<mapper namespace="com.book_conference.adminreserve.dao.AdminReserveIDao">
+	<select id="RoomBookList" resultType="com.book_conference.adminreserve.dto.RoomDto">
+	SELECT BOOK_NUM,BOOK_MEMBER, BOOK_TIME,BOOK_DATE 
+	
+	<if test="param1 == null">
+	FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	FROM ROOMB_TABLE
+	</if>
+	
+	WHERE BOOK_DATE = #{param2}
+	</select>
+	
+	<select id="RoomBookTotalList" resultType="String">
+	SELECT SUM(BOOK_TOTAL_TIME) AS SUMCNT 
+	
+	<if test="param1 == null">
+	FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	FROM ROOMB_TABLE
+	</if>
+	
+	WHERE BOOK_DATE =#{param2}
+	</select>
+	
+	<select id="BookRestrictStatus" resultType="String">
+	SELECT COUNT(*) AS CNT 
+	
+	FROM RESTRICT_TABLE 
+	
+	WHERE RESTRICT_ROOM = #{param1} AND RESTRICT_DATE =#{param2}
+	</select>
+	
+	
+	<insert id="RestrictBookStatus">
+		INSERT INTO RESTRICT_TABLE (RESTRICT_NUM, RESTRICT_ROOM, RESTRICT_DATE)
+		VALUES ((SELECT  NVL(MAX(RESTRICT_NUM),0) FROM RESTRICT_TABLE)+1, 
+		#{param1}, #{param2})
+	</insert>
+	
+	<delete id="ReleaseRestrictBookStatus">
+    DELETE FROM RESTRICT_TABLE WHERE RESTRICT_ROOM = #{param1}
+    AND RESTRICT_DATE =#{param2}
+	</delete>
+
+	<insert id="BookWrite">
+	INSERT INTO 
+	<if test="param1 == null">
+	 ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	 ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	 ROOMB_TABLE
+	</if>
+		(BOOK_NUM, BOOK_MEMBER, BOOK_TIME, BOOK_TOTAL_TIME,BOOK_DATE,BOOK_REASON,CREATE_TIME,UPDATE_TIME)
+		VALUES 
+		((
+		SELECT NVL(MAX(BOOK_NUM),0)
+		<if test="param1 == null">
+		FROM ROOMA_TABLE
+		</if>
+		<if test="param1 != null and param1.equals('ROOMA')">
+		FROM ROOMA_TABLE
+		</if>
+		<if test="param1 != null and param1.equals('ROOMB')">
+		FROM ROOMB_TABLE
+		</if>
+		)+1, 
+		#{param2}, #{param3}, #{param4}, #{param5}, #{param6},SYSDATE,SYSDATE)
+	</insert>
+	
+	<select id="SelectReserveList" resultType="com.book_conference.adminreserve.dto.RoomDto">
+	SELECT * FROM (SELECT BOOK_NUM, BOOK_MEMBER, 
+	BOOK_TIME, BOOK_TOTAL_TIME, BOOK_DATE, 
+	ROW_NUMBER() OVER (ORDER BY BOOK_DATE DESC) AS RNUM
+	
+	<if test="param1 == null">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	 FROM ROOMB_TABLE
+	</if>
+	
+	WHERE BOOK_DATE LIKE CONCAT(#{param2},'%') )
+	WHERE RNUM BETWEEN (#{param3}*7-6) AND (#{param3}*7)
+	</select>
+	
+	<delete id="DeleteBook">
+    DELETE
+	<if test="param1 == null">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	 FROM ROOMB_TABLE
+	</if>
+	WHERE BOOK_NUM = #{param2}
+	</delete>
+	
+	<select id="SelectReserveListCount" resultType="int">
+	SELECT COUNT(*) AS CNT 
+	
+	<if test="param1 == null">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	 FROM ROOMB_TABLE
+	</if>
+	
+	WHERE BOOK_DATE LIKE CONCAT(#{param2},'%')
+	</select>
+	
+	<select id="SelectBookInfo" resultType="com.book_conference.adminreserve.dto.RoomDto">
+	SELECT *
+	<if test="param1 == null">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	 FROM ROOMB_TABLE
+	</if>
+	WHERE BOOK_NUM=#{param2}
+	</select>
+	
+	
+	<update id="BookUpdate">
+	UPDATE 
+	<if test="param1 == null">
+	 ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	 ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	 ROOMB_TABLE
+	</if>
+	SET
+	BOOK_TIME = #{param2}, 
+	BOOK_TOTAL_TIME = #{param3},
+	BOOK_DATE = #{param4},
+	BOOK_REASON = #{param5},
+	BOOK_MEMBER = #{param6},
+	UPDATE_TIME = SYSDATE
+	WHERE BOOK_NUM = #{param7}
+	</update>
+	
+	<select id="ReserveStatusList" resultType="com.book_conference.adminreserve.dto.RoomDto">
+	SELECT * FROM (SELECT BOOK_NUM, BOOK_MEMBER, 
+	BOOK_TIME, BOOK_TOTAL_TIME, BOOK_DATE, 
+	ROW_NUMBER() OVER (ORDER BY BOOK_NUM DESC) AS RNUM
+	
+	<if test="param1 == null">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	 FROM ROOMB_TABLE
+	</if>
+	
+	WHERE BOOK_DATE LIKE CONCAT(#{param2},'%') )
+	WHERE RNUM BETWEEN (#{param3}*7-6) AND (#{param3}*7)
+	</select>
+	
+	<select id="ReserveStatusListCount" resultType="int">
+	SELECT COUNT(*) AS CNT 
+	
+	<if test="param1 == null">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMA')">
+	 FROM ROOMA_TABLE
+	</if>
+	<if test="param1 != null and param1.equals('ROOMB')">
+	 FROM ROOMB_TABLE
+	</if>
+	WHERE BOOK_DATE LIKE CONCAT(#{param2},'%')
+	</select>
+
+</mapper>
